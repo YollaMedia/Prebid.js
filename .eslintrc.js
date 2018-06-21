@@ -18,6 +18,7 @@ module.exports = {
     "sourceType": "module"
   },
   "rules": {
+    "no-debugger": process.env.NODE_ENV === 'production' ? 'error' : 'off',
     "comma-dangle": "off",
     "semi": "off",
     "space-before-function-paren": "off",

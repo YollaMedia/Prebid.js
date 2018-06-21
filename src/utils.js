@@ -297,7 +297,7 @@ var debugTurnedOn = function () {
     config.setConfig({ debug });
     _loggingChecked = true;
   }
-
+  debugger;
   return !!config.getConfig('debug');
 };
 
