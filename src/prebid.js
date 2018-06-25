@@ -715,3 +715,9 @@ $$PREBID_GLOBAL$$.processQueue = function() {
   processQueue($$PREBID_GLOBAL$$.que);
   processQueue($$PREBID_GLOBAL$$.cmd);
 };
+
+$$PREBID_GLOBAL$$.getHighestCpmBidsFromCache = function (bids, adUnitCode) {
+  let bidsReceived = getHighestCpmBidsFromBidPool(bids, getLatestHighestCpmBid);
+  return targeting.getWinningBids(adUnitCode, bidsReceived)
+    .map(removeRequestId);
+};
