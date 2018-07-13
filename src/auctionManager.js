@@ -93,6 +93,15 @@ export function newAuctionManager() {
     if (bid) bid.status = status;
   }
 
+  auctionManager.addBidReceived = function(bid) {
+    const auction = find(_auctions, auction => auction.getAuctionId() === bid.auctionId);
+    if (auction) {
+      auction.addBidReceived(bid);
+    } else {
+      utils.logWarn(`Auction not found when adding winning bid`);
+    }
+  }
+
   function _addAuction(auction) {
     _auctions.push(auction);
   }

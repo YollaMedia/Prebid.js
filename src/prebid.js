@@ -721,3 +721,7 @@ $$PREBID_GLOBAL$$.getHighestCpmBidsFromCache = function (bids, adUnitCode) {
   return adUnitCode ? targeting.getWinningBids(adUnitCode, bidsReceived)
     .map(removeRequestId) : bidsReceived;
 };
+
+$$PREBID_GLOBAL$$.addBid = function(bid) {
+  auctionManager.addBidReceived(bid);
+};
