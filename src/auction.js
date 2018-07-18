@@ -105,6 +105,16 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
   function addBidRequests(bidderRequests) { _bidderRequests = _bidderRequests.concat(bidderRequests) };
   function addBidReceived(bidsReceived) { _bidsReceived = _bidsReceived.concat(bidsReceived); }
 
+  function removeBidReceived(bid) {
+    for (let index = 0; index < _bidsReceived.length; index++) {
+      const _bid = _bidsReceived[index];
+      if (bid.adId === _bid.adId) {
+        _bidsReceived.splice(index, 1);
+        break;
+      }
+    }
+  }
+
   function startAuctionTimer() {
     const timedOut = true;
     const timeoutCallback = executeCallback.bind(null, timedOut);
@@ -281,6 +291,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
 
   return {
     addBidReceived,
+    removeBidReceived,
     executeCallback,
     callBids,
     bidsBackAll,

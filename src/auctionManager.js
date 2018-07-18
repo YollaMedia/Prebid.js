@@ -102,6 +102,15 @@ export function newAuctionManager() {
     }
   }
 
+  auctionManager.removeBidReceived = function(bid) {
+    const auction = find(_auctions, auction => auction.getAuctionId() === bid.auctionId);
+    if (auction) {
+      auction.removeBidReceived(bid);
+    } else {
+      utils.logWarn(`Auction not found when adding winning bid`);
+    }
+  }
+
   function _addAuction(auction) {
     _auctions.push(auction);
   }

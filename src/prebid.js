@@ -725,3 +725,7 @@ $$PREBID_GLOBAL$$.getHighestCpmBidsFromCache = function (bids, adUnitCode) {
 $$PREBID_GLOBAL$$.addBid = function(bid) {
   auctionManager.addBidReceived(bid);
 };
+
+$$PREBID_GLOBAL$$.removeBid = function(bid) {
+  auctionManager.removeBidReceived(bid);
+};
