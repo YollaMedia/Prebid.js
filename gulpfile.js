@@ -185,7 +185,11 @@ gulp.task('webpack', ['clean'], function() {
     .pipe(helpers.nameModules(externalModules))
     .pipe(webpackStream(cloned, webpack))
     .pipe(replace('$prebid.version$', prebid.version))
-    .pipe(uglify())
+    .pipe(uglify({
+      compress: false,
+      mangle: false,
+      sourceMap: true
+    }))
     .pipe(
       gulpif(
         file => file.basename === 'prebid-core.js',

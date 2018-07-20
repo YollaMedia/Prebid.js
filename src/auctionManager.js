@@ -107,7 +107,7 @@ export function newAuctionManager() {
     if (auction) {
       auction.removeBidReceived(bid);
     } else {
-      utils.logWarn(`Auction not found when adding winning bid`);
+      utils.logWarn(`Auction not found when removing bid`);
     }
   }
 
