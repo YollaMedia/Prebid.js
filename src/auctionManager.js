@@ -111,7 +111,7 @@ export function newAuctionManager() {
     }
   }
 
-  auctionManager.getAcution = function(auctionId) {
+  auctionManager.getAuction = function(auctionId) {
     return find(_auctions, auction => auction.getAuctionId() === auctionId);
   }
 
