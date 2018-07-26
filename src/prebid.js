@@ -760,5 +760,5 @@ $$PREBID_GLOBAL$$.removeBid = function(bid) {
 };
 
 $$PREBID_GLOBAL$$.getAuction = function(auctionId) {
-  auctionManager.getAuction(auctionId);
+  return auctionManager.getAuction(auctionId);
 };
