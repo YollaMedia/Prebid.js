@@ -111,6 +111,10 @@ export function newAuctionManager() {
     }
   }
 
+  auctionManager.getAcution = function(auctionId) {
+    return find(_auctions, auction => auction.getAuctionId() === auctionId);
+  }
+
   function _addAuction(auction) {
     _auctions.push(auction);
   }
