@@ -27,7 +27,6 @@ module.exports = {
     // Violations of these styles should be fixed, and the exceptions removed over time.
     //
     // See Issue #1111.
-    "camelcase": "off",
     "eqeqeq": "off",
     "no-return-assign": "off",
     "no-throw-literal": "off",
