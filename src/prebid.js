@@ -766,3 +766,69 @@ $$PREBID_GLOBAL$$.getAuction = function(auctionId) {
 $$PREBID_GLOBAL$$.findBidByAdId = function(adId) {
   return auctionManager.findBidByAdId(adId);
 };
+
+$$PREBID_GLOBAL$$.setTargetingForGPT = function(targetingSet, customSlotMatching) {
+  return targeting.setTargetingForGPT(targetingSet, customSlotMatching);
+};
+
+$$PREBID_GLOBAL$$.requestBidsSync = createHook('sync', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, skipBidRequest } = {}) {
+  events.emit(REQUEST_BIDS);
+  const cbTimeout = timeout || config.getConfig('bidderTimeout');
+  adUnits = adUnits || $$PREBID_GLOBAL$$.adUnits;
+
+  utils.logInfo('Invoking $$PREBID_GLOBAL$$.requestBidsSync', arguments);
+
+  if (adUnitCodes && adUnitCodes.length) {
+    // if specific adUnitCodes supplied filter adUnits for those codes
+    adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
+  } else {
+    // otherwise derive adUnitCodes from adUnits
+    adUnitCodes = adUnits && adUnits.map(unit => unit.code);
+  }
+
+  /*
+   * for a given adunit which supports a set of mediaTypes
+   * and a given bidder which supports a set of mediaTypes
+   * a bidder is eligible to participate on the adunit
+   * if it supports at least one of the mediaTypes on the adunit
+   */
+  adUnits.forEach(adUnit => {
+    // get the adunit's mediaTypes, defaulting to banner if mediaTypes isn't present
+    const adUnitMediaTypes = Object.keys(adUnit.mediaTypes || {'banner': 'banner'});
+
+    // get the bidder's mediaTypes
+    const allBidders = adUnit.bids.map(bid => bid.bidder);
+    const bidderRegistry = adaptermanager.bidderRegistry;
+
+    const s2sConfig = config.getConfig('s2sConfig');
+    const s2sBidders = s2sConfig && s2sConfig.bidders;
+    const bidders = (s2sBidders) ? allBidders.filter(bidder => {
+      return !includes(s2sBidders, bidder);
+    }) : allBidders;
+
+    if (!adUnit.transactionId) {
+      adUnit.transactionId = utils.generateUUID();
+    }
+
+    bidders.forEach(bidder => {
+      const adapter = bidderRegistry[bidder];
+      const spec = adapter && adapter.getSpec && adapter.getSpec();
+      // banner is default if not specified in spec
+      const bidderMediaTypes = (spec && spec.supportedMediaTypes) || ['banner'];
+
+      // check if the bidder's mediaTypes are not in the adUnit's mediaTypes
+      const bidderEligible = adUnitMediaTypes.some(type => includes(bidderMediaTypes, type));
+      if (!bidderEligible) {
+        // drop the bidder from the ad unit if it's not compatible
+        utils.logWarn(utils.unsupportedBidderMessage(adUnit, bidder));
+        adUnit.bids = adUnit.bids.filter(bid => bid.bidder !== bidder);
+      }
+    });
+  });
+
+  const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels});
+  if (!skipBidRequest) {
+    auction.callBids();
+  }
+  return auction;
+});
