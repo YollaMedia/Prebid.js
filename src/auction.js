@@ -147,7 +147,7 @@ export function newAuction({
 
     if (_callback != null) {
       /**
-       * DEFY_PB CACHE INJECTION
+       * YMPB CACHE INJECTION
        * This process need to be skipped, if the requestion is not for Ad rendering
        */
       if (_callback.cacheInjection) {
