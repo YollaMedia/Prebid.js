@@ -53,11 +53,18 @@ gulp.task('run-tests', ['lint', 'test-coverage']);
 
 gulp.task('build', ['build-bundle-prod']);
 
+<<<<<<< HEAD
 gulp.task('clean', function() {
   return gulp
     .src(['build'], {
       read: false
     })
+=======
+gulp.task('clean', function () {
+  return gulp.src(['build'], {
+    read: false
+  })
+>>>>>>> 1.23.0
     .pipe(clean());
 });
 
@@ -114,6 +121,7 @@ function bundle(dev, moduleArr) {
   gutil.log('Appending ' + prebid.globalVarName + '.processQueue();');
   gutil.log('Generating bundle:', outputFileName);
 
+<<<<<<< HEAD
   return gulp
     .src(entries)
     .pipe(gulpif(dev, sourcemaps.init({ loadMaps: true })))
@@ -126,6 +134,17 @@ function bundle(dev, moduleArr) {
         })
       )
     )
+=======
+  return gulp.src(
+    entries
+  )
+    .pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
+    .pipe(concat(outputFileName))
+    .pipe(gulpif(!argv.manualEnable, footer('\n<%= global %>.processQueue();', {
+      global: prebid.globalVarName
+    }
+    )))
+>>>>>>> 1.23.0
     .pipe(gulpif(dev, sourcemaps.write('.')));
 }
 
@@ -209,6 +228,7 @@ gulp.task('webpack', ['clean'], function() {
 // If --file "<path-to-test-file>" is given, the task will only run tests in the specified file.
 // If --browserstack is given, it will run the full suite of currently supported browsers.
 // If --browsers is given, browsers can be chosen explicitly. e.g. --browsers=chrome,firefox,ie9
+<<<<<<< HEAD
 gulp.task('test', ['clean'], function(done) {
   var karmaConf = karmaConfMaker(
     false,
@@ -220,6 +240,12 @@ gulp.task('test', ['clean'], function(done) {
   var browserOverride = helpers
     .parseBrowserArgs(argv)
     .map(helpers.toCapitalCase);
+=======
+gulp.task('test', ['clean', 'lint'], function (done) {
+  var karmaConf = karmaConfMaker(false, argv.browserstack, argv.watch, argv.file);
+
+  var browserOverride = helpers.parseBrowserArgs(argv).map(helpers.toCapitalCase);
+>>>>>>> 1.23.0
   if (browserOverride.length > 0) {
     karmaConf.browsers = browserOverride;
   }
@@ -264,6 +290,7 @@ gulp.task('coveralls', ['test-coverage'], function() {
 });
 
 // Watch Task with Live Reload
+<<<<<<< HEAD
 gulp.task('watch', function() {
   gulp.watch(
     [
@@ -279,6 +306,19 @@ gulp.task('watch', function() {
     ]
   );
   gulp.watch(['loaders/**/*.js', 'test/spec/loaders/**/*.js'], ['lint']);
+=======
+gulp.task('watch', function () {
+  gulp.watch([
+    'src/**/*.js',
+    'modules/**/*.js',
+    'test/spec/**/*.js',
+    '!test/spec/loaders/**/*.js'
+  ], ['build-bundle-dev', 'test']);
+  gulp.watch([
+    'loaders/**/*.js',
+    'test/spec/loaders/**/*.js'
+  ], ['lint']);
+>>>>>>> 1.23.0
   connect.server({
     https: argv.https,
     port: port,
@@ -325,6 +365,7 @@ gulp.task('e2etest', ['devpack', 'webpack'], function() {
 
     var startWith = 'bs';
 
+<<<<<<< HEAD
     Object.keys(browsers)
       .filter(function(v) {
         return (
@@ -339,6 +380,17 @@ gulp.task('e2etest', ['devpack', 'webpack'], function() {
           cmdQueue.push(cmd);
         }
       });
+=======
+    Object.keys(browsers).filter(function(v) {
+      return v.substring(0, startWith.length) === startWith && browsers[v].browser !== 'iphone';
+    }).map(function(v, i, arr) {
+      var newArr = (i % 2 === 0) ? arr.slice(i, i + 2) : null;
+      if (newArr) {
+        var cmd = 'nightwatch --env ' + newArr.join(',') + cmdStr;
+        cmdQueue.push(cmd);
+      }
+    });
+>>>>>>> 1.23.0
   }
 
   return gulp.src('').pipe(shell(cmdQueue.join(';')));
