@@ -156,7 +156,7 @@ export function newAuction({
           let higestCpmBidCache = $$PREBID_GLOBAL$$.getHighestCpmBidsFromCache(
             higestCpmBid[0]
           );
-          if (higestCpmBidCache.adId !== higestCpmBid.adId) {
+          if (higestCpmBidCache.adId !== higestCpmBid[0].adId) {
             // 1. Try to remove the existed bid
             removeBidReceived(higestCpmBidCache);
             // 2. Add the bid to auction list
