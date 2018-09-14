@@ -8,5 +8,6 @@
     "pulsepointBidAdapter",
     "openxBidAdapter",
     "ixBidAdapter",
+    "tripleliftBidAdapter",
     "dfpAdServerVideo"
 ]
