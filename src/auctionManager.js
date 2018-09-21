@@ -16,7 +16,8 @@
  * @property {function(): Object} getStandardBidderAdServerTargeting - returns standard bidder targeting for all the adapters. Refer http://prebid.org/dev-docs/publisher-api-reference.html#module_pbjs.bidderSettings for more details
  */
 
-import { uniques, flatten } from './utils';
+// import * as utils from './utils';
+import { uniques, flatten, logWarn } from './utils';
 import { newAuction, getStandardBidderSettings, AUCTION_COMPLETED } from 'src/auction';
 import find from 'core-js/library/fn/array/find';
 
@@ -37,7 +38,7 @@ export function newAuctionManager() {
     if (auction) {
       auction.addWinningBid(bid);
     } else {
-      utils.logWarn(`Auction not found when adding winning bid`);
+      logWarn(`Auction not found when adding winning bid`);
     }
   }
 
@@ -98,7 +99,7 @@ export function newAuctionManager() {
     if (auction) {
       auction.addBidReceived(bid);
     } else {
-      utils.logWarn(`Auction not found when adding winning bid`);
+      logWarn(`Auction not found when adding winning bid`);
     }
   }
 
@@ -107,7 +108,7 @@ export function newAuctionManager() {
     if (auction) {
       auction.removeBidReceived(bid);
     } else {
-      utils.logWarn(`Auction not found when removing bid`);
+      logWarn(`Auction not found when removing bid`);
     }
   }
 
