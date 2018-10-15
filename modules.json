@@ -1,13 +1,14 @@
 [
-    "consentManagement",
+    "33across",
+    "aolBidAdapter",
     "appnexusBidAdapter",
+    "consentManagement",
+    "conversantBidAdapter",
+    "dfpAdServerVideo",
+    "ixBidAdapter",
+    "openxBidAdapter",
+    "pulsepointBidAdapter",
     "rubiconBidAdapter",
     "sovrnBidAdapter",
-    "conversantBidAdapter",
-    "aolBidAdapter",
-    "pulsepointBidAdapter",
-    "openxBidAdapter",
-    "ixBidAdapter",
-    "tripleliftBidAdapter",
-    "dfpAdServerVideo"
+    "tripleliftBidAdapter"
 ]
