@@ -226,7 +226,6 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
     let requests = {};
 
     if (bidRequests.length < 1) {
-      auctionDone(0); // YMPB
       utils.logWarn('No valid bid requests returned for auction');
       auctionDone();
     } else {
