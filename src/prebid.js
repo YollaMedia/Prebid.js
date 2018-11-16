@@ -13,6 +13,7 @@ import { sessionLoader } from 'src/debugging';
 import includes from 'core-js/library/fn/array/includes';
 import { adunitCounter } from './adUnits';
 import { isRendererRequired, executeRenderer } from './Renderer';
+import { getPriceBucketString } from './cpmBucketManager';
 
 const $$PREBID_GLOBAL$$ = getGlobal();
 const CONSTANTS = require('./constants.json');
@@ -829,3 +830,5 @@ $$PREBID_GLOBAL$$.requestBidsSync = createHook('sync', function ({ bidsBackHandl
   }
   return auction;
 });
+
+$$PREBID_GLOBAL$$.getPriceBucketString = getPriceBucketString;
