@@ -749,26 +749,32 @@ $$PREBID_GLOBAL$$.getHighestCpmBidsFromBidPool = function (bids, adUnitCode) {
     .map(removeRequestId) : bidsReceived;
 };
 
+// YMPB
 $$PREBID_GLOBAL$$.addBid = function(bid) {
   auctionManager.addBidReceived(bid);
 };
 
+// YMPB
 $$PREBID_GLOBAL$$.removeBid = function(bid) {
   auctionManager.removeBidReceived(bid);
 };
 
+// YMPB
 $$PREBID_GLOBAL$$.getAuction = function(auctionId) {
   return auctionManager.getAuction(auctionId);
 };
 
+// YMPB
 $$PREBID_GLOBAL$$.findBidByAdId = function(adId) {
   return auctionManager.findBidByAdId(adId);
 };
 
+// YMPB
 $$PREBID_GLOBAL$$.setTargetingForGPT = function(targetingSet, customSlotMatching) {
   return targeting.setTargetingForGPT(targetingSet, customSlotMatching);
 };
 
+// YMPB
 $$PREBID_GLOBAL$$.requestBidsSync = createHook('sync', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, skipBidRequest } = {}) {
   events.emit(REQUEST_BIDS);
   const cbTimeout = timeout || config.getConfig('bidderTimeout');
@@ -831,4 +837,5 @@ $$PREBID_GLOBAL$$.requestBidsSync = createHook('sync', function ({ bidsBackHandl
   return auction;
 });
 
+// YMPB
 $$PREBID_GLOBAL$$.getPriceBucketString = getPriceBucketString;
