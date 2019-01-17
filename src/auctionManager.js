@@ -16,9 +16,8 @@
  * @property {function(): Object} getStandardBidderAdServerTargeting - returns standard bidder targeting for all the adapters. Refer http://prebid.org/dev-docs/publisher-api-reference.html#module_pbjs.bidderSettings for more details
  */
 
-// import * as utils from './utils';
 import { uniques, flatten, logWarn } from './utils';
-import { newAuction, getStandardBidderSettings, AUCTION_COMPLETED } from 'src/auction';
+import { newAuction, getStandardBidderSettings, AUCTION_COMPLETED } from './auction';
 import find from 'core-js/library/fn/array/find';
 
 const CONSTANTS = require('./constants.json');
