@@ -817,7 +817,7 @@ $$PREBID_GLOBAL$$.requestBidsSync = createHook('sync', function ({ bidsBackHandl
 
     // get the bidder's mediaTypes
     const allBidders = adUnit.bids.map(bid => bid.bidder);
-    const bidderRegistry = adaptermanager.bidderRegistry;
+    const bidderRegistry = adapterManager.bidderRegistry;
 
     const s2sConfig = config.getConfig('s2sConfig');
     const s2sBidders = s2sConfig && s2sConfig.bidders;

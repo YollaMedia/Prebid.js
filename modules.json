@@ -1,11 +1,11 @@
 [
-    "33across",
+    "33acrossBidAdapter",
     "aolBidAdapter",
     "appnexusBidAdapter",
     "consentManagement",
     "conversantBidAdapter",
     "dfpAdServerVideo",
-    "gourmetadsBidAdapter",
+    "gumgumBidAdapter",
     "ixBidAdapter",
     "openxBidAdapter",
     "pulsepointBidAdapter",
