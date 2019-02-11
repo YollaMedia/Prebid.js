@@ -5,6 +5,7 @@
     "consentManagement",
     "conversantBidAdapter",
     "dfpAdServerVideo",
+    "gumgumBidAdapter",
     "ixBidAdapter",
     "openxBidAdapter",
     "pulsepointBidAdapter",
