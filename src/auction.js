@@ -156,11 +156,11 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
       if (_callback.cacheInjection) {
         try {
           var higestCpmBids = YMPB.getHighestCpmBidsFromCache(_adUnitCodes);
-          higestCpmBids.forEach(function(bid) {
-            if (bid.auctionId !== _auctionId || bid.__bidFrom) {
+          higestCpmBids.forEach(function (bid) {
+            if (bid.auctionId !== _auctionId || (bid.__bidFrom && bid.__bidFrom !== bid.adUnitCode)) {
               removeBidReceived(bid);
               bid.auctionId = _auctionId;
-              addBidReceived(bud);
+              addBidReceived(bid);
             }
           });
         } catch (error) {

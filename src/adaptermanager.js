@@ -420,6 +420,13 @@ exports.registerBidAdapter = function (bidAdaptor, bidderCode, {supportedMediaTy
   }
 };
 
+// YMPB
+exports.checkBidAdapter = function(bidderCode) {
+  var s2sConfig = config.getConfig('s2sConfig');
+  var s2sBidders = s2sConfig && s2sConfig.bidders;
+  return typeof _bidderRegistry[bidderCode] !== 'undefined' || (s2sBidders && includes(s2sBidders, alias));
+}
+
 exports.aliasBidAdapter = function (bidderCode, alias) {
   let existingAlias = _bidderRegistry[alias];
 
