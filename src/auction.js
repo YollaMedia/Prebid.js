@@ -155,18 +155,14 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
        */
       if (_callback.cacheInjection) {
         try {
-          let higestCpmBid = $$PREBID_GLOBAL$$.getHighestCpmBids(_adUnitCodes);
-          let higestCpmBidCache = $$PREBID_GLOBAL$$.getHighestCpmBidsFromCache(
-            higestCpmBid[0]
-          );
-          if (higestCpmBidCache && higestCpmBidCache.adId !== higestCpmBid[0].adId) {
-            // 1. Try to remove the existed bid
-            removeBidReceived(higestCpmBidCache);
-            // 2. Add the bid to auction list
-            higestCpmBidCache.auctionId = _auctionId;
-            higestCpmBidCache.adUnitCode = _adUnitCodes;
-            addBidReceived(higestCpmBidCache);
-          }
+          var higestCpmBids = YMPB.getHighestCpmBidsFromCache(_adUnitCodes);
+          higestCpmBids.forEach(function (bid) {
+            if (bid.auctionId !== _auctionId || (bid.__bidFrom && bid.__bidFrom !== bid.adUnitCode)) {
+              removeBidReceived(bid);
+              bid.auctionId = _auctionId;
+              addBidReceived(bid);
+            }
+          });
         } catch (error) {
           utils.logError(error);
         }

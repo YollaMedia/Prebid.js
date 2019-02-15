@@ -359,6 +359,13 @@ adapterManager.registerBidAdapter = function (bidAdaptor, bidderCode, {supported
   }
 };
 
+// YMPB
+adapterManager.checkBidAdapter = function(bidderCode) {
+  let s2sConfig = config.getConfig('s2sConfig');
+  let s2sBidders = s2sConfig && s2sConfig.bidders;
+  return typeof _bidderRegistry[bidderCode] !== 'undefined' || (s2sBidders && includes(s2sBidders, alias));
+}
+
 adapterManager.aliasBidAdapter = function (bidderCode, alias) {
   let existingAlias = _bidderRegistry[alias];
 

@@ -613,6 +613,10 @@ $$PREBID_GLOBAL$$.aliasBidder = function (bidderCode, alias) {
   }
 };
 
+$$PREBID_GLOBAL$$.checkBidAdapter = function(bidderCode) {
+  return adaptermanager.checkBidAdapter(bidderCode);
+};
+
 /**
  * The bid response object returned by an external bidder adapter during the auction.
  * @typedef {Object} AdapterBidResponse
