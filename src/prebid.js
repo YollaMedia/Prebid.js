@@ -856,7 +856,7 @@ $$PREBID_GLOBAL$$.setTargetingForGPT = function(targetingSet, customSlotMatching
 };
 
 // YMPB
-$$PREBID_GLOBAL$$.requestBidsSync = createHook('sync', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, skipBidRequest } = {}) {
+$$PREBID_GLOBAL$$.requestBidsSync = hook('sync', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, skipBidRequest } = {}) {
   events.emit(REQUEST_BIDS);
   const cbTimeout = timeout || config.getConfig('bidderTimeout');
   adUnits = adUnits || $$PREBID_GLOBAL$$.adUnits;
