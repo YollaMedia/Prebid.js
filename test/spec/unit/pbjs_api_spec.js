@@ -106,7 +106,7 @@ var createSlotArrayScenario2 = function createSlotArrayScenario2() {
   ];
 };
 
-window.googletag = {
+window.googletag = window.googletag || {
   _slots: [],
   pubads: function () {
     var self = this;
@@ -130,7 +130,7 @@ var createTagAST = function() {
   return tags;
 };
 
-window.apntag = {
+window.apntag = window.apntag || {
   keywords: [],
   tags: createTagAST(),
   setKeywords: function(key, params, options) {
@@ -2417,4 +2417,6 @@ describe('Unit: Prebid Module', function () {
       expect(bids[0].adId).to.equal('adid-1');
     });
   });
+
+  // YMPB
 });

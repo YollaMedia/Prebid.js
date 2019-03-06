@@ -74,5 +74,36 @@ describe('Publisher API', function () {
     it('should have function $$PREBID_GLOBAL$$.getAllWinningBids', function () {
       assert.isFunction($$PREBID_GLOBAL$$.getAllWinningBids);
     });
+
+    /**
+     * The following cases are created for YMPB
+     */
+    it('should have function $$PREBID_GLOBAL$$.addBid', function () {
+      assert.isFunction($$PREBID_GLOBAL$$.addBid);
+    });
+
+    it('should have function $$PREBID_GLOBAL$$.removeBid', function () {
+      assert.isFunction($$PREBID_GLOBAL$$.removeBid);
+    });
+
+    it('should have function $$PREBID_GLOBAL$$.getAuction', function () {
+      assert.isFunction($$PREBID_GLOBAL$$.getAuction);
+    });
+
+    it('should have function $$PREBID_GLOBAL$$.findBidByAdId', function () {
+      assert.isFunction($$PREBID_GLOBAL$$.findBidByAdId);
+    });
+
+    it('should have function $$PREBID_GLOBAL$$.setTargetingForGPT', function () {
+      assert.isFunction($$PREBID_GLOBAL$$.setTargetingForGPT);
+    });
+
+    it('should have function $$PREBID_GLOBAL$$.requestBidsSync', function () {
+      assert.isFunction($$PREBID_GLOBAL$$.requestBidsSync);
+    });
+
+    it('should have function $$PREBID_GLOBAL$$.getPriceBucketString', function () {
+      assert.isFunction($$PREBID_GLOBAL$$.getPriceBucketString);
+    });
   });
 });
