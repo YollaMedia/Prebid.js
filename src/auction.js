@@ -184,7 +184,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
 
         const adUnitCodes = _adUnitCodes;
         const bids = _bidsReceived
-          .filter(adUnitsFilter.bind(this, adUnitCodes))
+          .filter(utils.bind.call(adUnitsFilter, this, adUnitCodes))
           .reduce(groupByPlacement, {});
         _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut]);
       } catch (e) {
@@ -447,7 +447,7 @@ function tryAddVideoBid(auctionInstance, bidResponse, bidRequests, afterBidAdded
   }
 }
 
-const callPrebidCache = hook('async', function(auctionInstance, bidResponse, afterBidAdded, bidderRequest) {
+export const callPrebidCache = hook('async', function(auctionInstance, bidResponse, afterBidAdded, bidderRequest) {
   store([bidResponse], function (error, cacheIds) {
     if (error) {
       utils.logWarn(`Failed to save to the video cache: ${error}. Video bid must be discarded.`);
@@ -519,7 +519,7 @@ function getPreparedBidForAuction({adUnitCode, bid, bidderRequest, auctionId}) {
   // if there is any key value pairs to map do here
   var keyValues;
   if (bidObject.bidderCode && (bidObject.cpm > 0 || bidObject.dealId)) {
-    keyValues = getKeyValueTargetingPairs(bidObject.bidderCode, bidObject);
+    keyValues = getKeyValueTargetingPairs(bidObject.bidderCode, bidObject, bidReq);
   }
 
   // use any targeting provided as defaults, otherwise just set from getKeyValueTargetingPairs
@@ -594,7 +594,7 @@ export function getStandardBidderSettings(mediaType) {
   return bidderSettings[CONSTANTS.JSON_MAPPING.BD_SETTING_STANDARD];
 }
 
-export function getKeyValueTargetingPairs(bidderCode, custBidObj) {
+export function getKeyValueTargetingPairs(bidderCode, custBidObj, bidReq) {
   if (!custBidObj) {
     return {};
   }
@@ -617,7 +617,7 @@ export function getKeyValueTargetingPairs(bidderCode, custBidObj) {
 
   // set native key value targeting
   if (custBidObj['native']) {
-    keyValues = Object.assign({}, keyValues, getNativeTargeting(custBidObj));
+    keyValues = Object.assign({}, keyValues, getNativeTargeting(custBidObj, bidReq));
   }
 
   return keyValues;
