@@ -629,7 +629,7 @@ $$PREBID_GLOBAL$$.aliasBidder = function (bidderCode, alias) {
 };
 
 $$PREBID_GLOBAL$$.checkBidAdapter = function(bidderCode) {
-  return adaptermanager.checkBidAdapter(bidderCode);
+  return adapterManager.checkBidAdapter(bidderCode);
 };
 
 /**
