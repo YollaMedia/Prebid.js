@@ -89,7 +89,7 @@ const queuedCalls = [];
   *
   * @returns {Auction} auction instance
   */
-export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) {
+export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, useYmpbCache, skipRendering}) { // YMPB
   let _adUnits = adUnits;
   let _labels = labels;
   let _adUnitCodes = adUnitCodes;
@@ -104,6 +104,8 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
   let _timer;
   let _timeout = cbTimeout;
   let _winningBids = [];
+  let _useYmpbCache = useYmpbCache;
+  let _skipRendering = skipRendering;
 
   function addBidRequests(bidderRequests) { _bidderRequests = _bidderRequests.concat(bidderRequests) };
   function addBidReceived(bidsReceived) { _bidsReceived = _bidsReceived.concat(bidsReceived); }
@@ -142,6 +144,10 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
     _timer = timer;
   }
 
+  /**
+   * @param {true|false} timedOut is calling after timeout
+   * @param {true|false} cleartimer should clear timeout
+   */
   function executeCallback(timedOut, cleartimer) {
     // clear timer when done calls executeCallback
     if (cleartimer) {
@@ -153,20 +159,20 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
        * YMPB CACHE INJECTION
        * This process need to be skipped, if the requestion is not for Ad rendering
        */
-      if (_callback.cacheInjection) {
-        try {
-          var higestCpmBids = YMPB.getHighestCpmBidsFromCache(_adUnitCodes);
-          higestCpmBids.forEach(function (bid) {
-            if (bid.auctionId !== _auctionId || (bid.__bidFrom && bid.__bidFrom !== bid.adUnitCode)) {
-              removeBidReceived(bid);
-              bid.auctionId = _auctionId;
-              addBidReceived(bid);
-            }
-          });
-        } catch (error) {
-          utils.logError(error);
-        }
-      }
+      // if (_callback.cacheInjection) {
+      //   try {
+      //     var higestCpmBids = YMPB.getHighestCpmBidsFromCache(_adUnitCodes);
+      //     higestCpmBids.forEach(function (bid) {
+      //       if (bid.auctionId !== _auctionId || (bid.__bidFrom && bid.__bidFrom !== bid.adUnitCode)) {
+      //         removeBidReceived(bid);
+      //         bid.auctionId = _auctionId;
+      //         addBidReceived(bid);
+      //       }
+      //     });
+      //   } catch (error) {
+      //     utils.logError(error);
+      //   }
+      // }
       let timedOutBidders = [];
       if (timedOut) {
         utils.logMessage(`Auction ${_auctionId} timedOut`);
@@ -210,6 +216,20 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
     utils.logInfo(`Bids Received for Auction with id: ${_auctionId}`, _bidsReceived);
     _auctionStatus = AUCTION_COMPLETED;
     executeCallback(false, true);
+  }
+
+  // YMPB
+  function callCaches(bids) {
+    _auctionStatus = AUCTION_STARTED;
+    console.log(_auctionId);
+    console.log(_adUnits);
+    console.log(_adUnitCodes);
+    bids.forEach(bid => {
+      removeBidReceived(bid);
+      bid.auctionId = _auctionId;
+      addBidReceived(bid);
+    });
+    auctionDone();
   }
 
   function callBids() {
@@ -332,15 +352,13 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels}) 
     addNoBid,
     executeCallback,
     callBids,
+    callCaches, // YMPB
     addWinningBid,
     setBidTargeting,
     getWinningBids: () => _winningBids,
     getTimeout: () => _timeout,
     getAuctionId: () => _auctionId,
     getAuctionStatus: () => _auctionStatus,
-    setAuctionStatus: status => { // YMBP
-      _auctionStatus = status;
-    },
     getAdUnits: () => _adUnits,
     getAdUnitCodes: () => _adUnitCodes,
     getBidRequests: () => _bidderRequests,

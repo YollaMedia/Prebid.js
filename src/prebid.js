@@ -400,8 +400,8 @@ $$PREBID_GLOBAL$$.removeAdUnit = function (adUnitCode) {
  * @param {Array} requestOptions.labels
  * @alias module:pbjs.requestBids
  */
-// YMPB: adding skipBidRequest
-$$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, skipBidRequest } = {}) {
+// YMPB: adding useYmpbCache
+$$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, useYmpbCache, skipRendering } = {}) {
   events.emit(REQUEST_BIDS);
   const cbTimeout = timeout || config.getConfig('bidderTimeout');
   adUnits = adUnits || $$PREBID_GLOBAL$$.adUnits;
@@ -470,13 +470,33 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
     return;
   }
 
-  const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels});
-  adUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, auction.getAuctionId()));
   // YMPB
-  if (!skipBidRequest) {
-    auction.callBids();
+  if (useYmpbCache) {
+    var bidCaches = YMPB.getBidsFromCache(adUnits);
+    if (bidCaches.length) {
+      var cachedAdUnitCodes = bidCaches.map(bid => bid.adUnitCode);
+      var cachedAdUnits = adUnits.filter(unit => includes(cachedAdUnitCodes, unit.code));
+      const cachAuction = auctionManager.createAuction({cachedAdUnits, cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, useYmpbCache, skipRendering});
+      cachedAdUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, cachAuction.getAuctionId()));
+      cachAuction.callCaches(bidCaches);
+      adUnitCodes = adUnitCodes.filter(_code => cachedAdUnitCodes.indexOf(_code) < 0);
+      adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
+    }
   }
-  return auction;
+
+  console.log('adUnitCodes => ', adUnitCodes);
+  console.log('adUnits => ', adUnits);
+
+  if (adUnitCodes.length) {
+    var auctionOpts = {adUnits, adUnitCodes, cbTimeout, labels, useYmpbCache, skipRendering};
+    if (!skipRendering) {
+      auctionOpts.callback = bidsBackHandler;
+    }
+    const auction = auctionManager.createAuction(auctionOpts);
+    adUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, auction.getAuctionId()));
+    auction.callBids();
+    return auction;
+  }
 });
 
 /**
@@ -871,67 +891,67 @@ $$PREBID_GLOBAL$$.setTargetingForGPT = function(targetingSet, customSlotMatching
 };
 
 // YMPB
-$$PREBID_GLOBAL$$.requestBidsSync = hook('sync', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, skipBidRequest } = {}) {
-  events.emit(REQUEST_BIDS);
-  const cbTimeout = timeout || config.getConfig('bidderTimeout');
-  adUnits = adUnits || $$PREBID_GLOBAL$$.adUnits;
+// $$PREBID_GLOBAL$$.requestBidsSync = hook('sync', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, useYmpbCache, skipRendering } = {}) {
+//   events.emit(REQUEST_BIDS);
+//   const cbTimeout = timeout || config.getConfig('bidderTimeout');
+//   adUnits = adUnits || $$PREBID_GLOBAL$$.adUnits;
 
-  utils.logInfo('Invoking $$PREBID_GLOBAL$$.requestBidsSync', arguments);
+//   utils.logInfo('Invoking $$PREBID_GLOBAL$$.requestBidsSync', arguments);
 
-  if (adUnitCodes && adUnitCodes.length) {
-    // if specific adUnitCodes supplied filter adUnits for those codes
-    adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
-  } else {
-    // otherwise derive adUnitCodes from adUnits
-    adUnitCodes = adUnits && adUnits.map(unit => unit.code);
-  }
+//   if (adUnitCodes && adUnitCodes.length) {
+//     // if specific adUnitCodes supplied filter adUnits for those codes
+//     adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
+//   } else {
+//     // otherwise derive adUnitCodes from adUnits
+//     adUnitCodes = adUnits && adUnits.map(unit => unit.code);
+//   }
 
-  /*
-   * for a given adunit which supports a set of mediaTypes
-   * and a given bidder which supports a set of mediaTypes
-   * a bidder is eligible to participate on the adunit
-   * if it supports at least one of the mediaTypes on the adunit
-   */
-  adUnits.forEach(adUnit => {
-    // get the adunit's mediaTypes, defaulting to banner if mediaTypes isn't present
-    const adUnitMediaTypes = Object.keys(adUnit.mediaTypes || {'banner': 'banner'});
+//   /*
+//    * for a given adunit which supports a set of mediaTypes
+//    * and a given bidder which supports a set of mediaTypes
+//    * a bidder is eligible to participate on the adunit
+//    * if it supports at least one of the mediaTypes on the adunit
+//    */
+//   adUnits.forEach(adUnit => {
+//     // get the adunit's mediaTypes, defaulting to banner if mediaTypes isn't present
+//     const adUnitMediaTypes = Object.keys(adUnit.mediaTypes || {'banner': 'banner'});
 
-    // get the bidder's mediaTypes
-    const allBidders = adUnit.bids.map(bid => bid.bidder);
-    const bidderRegistry = adapterManager.bidderRegistry;
+//     // get the bidder's mediaTypes
+//     const allBidders = adUnit.bids.map(bid => bid.bidder);
+//     const bidderRegistry = adapterManager.bidderRegistry;
 
-    const s2sConfig = config.getConfig('s2sConfig');
-    const s2sBidders = s2sConfig && s2sConfig.bidders;
-    const bidders = (s2sBidders) ? allBidders.filter(bidder => {
-      return !includes(s2sBidders, bidder);
-    }) : allBidders;
+//     const s2sConfig = config.getConfig('s2sConfig');
+//     const s2sBidders = s2sConfig && s2sConfig.bidders;
+//     const bidders = (s2sBidders) ? allBidders.filter(bidder => {
+//       return !includes(s2sBidders, bidder);
+//     }) : allBidders;
 
-    if (!adUnit.transactionId) {
-      adUnit.transactionId = utils.generateUUID();
-    }
+//     if (!adUnit.transactionId) {
+//       adUnit.transactionId = utils.generateUUID();
+//     }
 
-    bidders.forEach(bidder => {
-      const adapter = bidderRegistry[bidder];
-      const spec = adapter && adapter.getSpec && adapter.getSpec();
-      // banner is default if not specified in spec
-      const bidderMediaTypes = (spec && spec.supportedMediaTypes) || ['banner'];
+//     bidders.forEach(bidder => {
+//       const adapter = bidderRegistry[bidder];
+//       const spec = adapter && adapter.getSpec && adapter.getSpec();
+//       // banner is default if not specified in spec
+//       const bidderMediaTypes = (spec && spec.supportedMediaTypes) || ['banner'];
 
-      // check if the bidder's mediaTypes are not in the adUnit's mediaTypes
-      const bidderEligible = adUnitMediaTypes.some(type => includes(bidderMediaTypes, type));
-      if (!bidderEligible) {
-        // drop the bidder from the ad unit if it's not compatible
-        utils.logWarn(utils.unsupportedBidderMessage(adUnit, bidder));
-        adUnit.bids = adUnit.bids.filter(bid => bid.bidder !== bidder);
-      }
-    });
-  });
+//       // check if the bidder's mediaTypes are not in the adUnit's mediaTypes
+//       const bidderEligible = adUnitMediaTypes.some(type => includes(bidderMediaTypes, type));
+//       if (!bidderEligible) {
+//         // drop the bidder from the ad unit if it's not compatible
+//         utils.logWarn(utils.unsupportedBidderMessage(adUnit, bidder));
+//         adUnit.bids = adUnit.bids.filter(bid => bid.bidder !== bidder);
+//       }
+//     });
+//   });
 
-  const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels});
-  if (!skipBidRequest) {
-    auction.callBids();
-  }
-  return auction;
-});
+//   const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels});
+//   if (!useYmpbCache) {
+//     auction.callBids();
+//   }
+//   return auction;
+// });
 
 // YMPB
 $$PREBID_GLOBAL$$.getPriceBucketString = getPriceBucketString;
