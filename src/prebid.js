@@ -246,6 +246,10 @@ $$PREBID_GLOBAL$$.setTargetingForGPTAsync = function (adUnit, customSlotMatching
   // first reset any old targeting
   targeting.resetPresetTargeting(adUnit);
 
+  if ($$PREBID_GLOBAL$$.resetTargetKey) {
+    targetingSet = $$PREBID_GLOBAL$$.resetTargetKey(targetingSet);
+  }
+
   // now set new targeting keys
   targeting.setTargetingForGPT(targetingSet, customSlotMatching);
 
