@@ -218,7 +218,11 @@ export function parseSizesInput(sizeObj) {
     }
   }
 
-  return parsedSizes;
+  // return parsedSizes;
+  // YMPB: filter out empty item
+  return parsedSizes.filter(function(size) {
+    return size && size.length;
+  });
 }
 
 // parse a GPT style sigle size array, (i.e [300,250])
