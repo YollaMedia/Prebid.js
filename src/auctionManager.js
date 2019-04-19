@@ -76,8 +76,8 @@ export function newAuctionManager() {
       .filter(uniques);
   };
 
-  auctionManager.createAuction = function({ adUnits, adUnitCodes, callback, cbTimeout, labels, useYmpbCache, skipRendering }) { // YMPB
-    const auction = newAuction({ adUnits, adUnitCodes, callback, cbTimeout, labels, useYmpbCache, skipRendering }); // YMPB
+  auctionManager.createAuction = function({ adUnits, adUnitCodes, callback, cbTimeout, labels, auctionId, useYmpbCache, skipRendering }) { // YMPB
+    const auction = newAuction({ adUnits, adUnitCodes, callback, cbTimeout, labels, auctionId, useYmpbCache, skipRendering }); // YMPB
     _addAuction(auction);
     return auction;
   };
