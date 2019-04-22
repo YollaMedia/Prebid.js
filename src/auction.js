@@ -134,7 +134,9 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       noBids: _noBids,
       bidsReceived: _bidsReceived,
       winningBids: _winningBids,
-      timeout: _timeout
+      timeout: _timeout,
+      useYmpbCache: _useYmpbCache,
+      skipRendering: _skipRendering
     };
   }
 
@@ -231,7 +233,8 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       addBidReceived(bid);
     });
     auctionDone();
-    
+  }
+
   function onTimelyResponse(bidderCode) {
     _timelyBidders.add(bidderCode);
   }
