@@ -189,7 +189,10 @@ export function parseSizesInput(sizeObj) {
     }
   }
 
-  return parsedSizes;
+  return parsedSizes.filter(function(size) {
+    return size && size.length;
+  });
+  // return parsedSizes;
 }
 
 // parse a GPT style sigle size array, (i.e [300,250])
