@@ -63,7 +63,7 @@ export function newTargeting(auctionManager) {
   targeting.resetPresetTargeting = function(adUnitCode) {
     if (isGptPubadsDefined()) {
       const adUnitCodes = getAdUnitCodes(adUnitCode);
-      const adUnits = auctionManager.getAdUnits().filter(adUnit => includes(adUnitCodes, adUnit.code));
+      const adUnits = auctionManager.getAdUnits().filter(adUnit => adUnit && includes(adUnitCodes, adUnit.code)); // YMPB adding adUnit &&
       window.googletag.pubads().getSlots().forEach(slot => {
         pbTargetingKeys.forEach(function(key) {
           // reset only registered adunits

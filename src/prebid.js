@@ -404,7 +404,7 @@ $$PREBID_GLOBAL$$.removeAdUnit = function (adUnitCode) {
  * @alias module:pbjs.requestBids
  */
 // YMPB: adding useYmpbCache
-$$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, auctionId, useYmpbCache, skipRendering } = {}) {
+$$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, auctionId, useYmpbCache } = {}) {
   events.emit(REQUEST_BIDS);
   const cbTimeout = timeout || config.getConfig('bidderTimeout');
   adUnits = adUnits || $$PREBID_GLOBAL$$.adUnits;
@@ -479,9 +479,11 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
     if (bidCaches.length) {
       var cachedAdUnitCodes = bidCaches.map(bid => bid.adUnitCode);
       var cachedAdUnits = adUnits.filter(unit => includes(cachedAdUnitCodes, unit.code));
-      const cachAuction = auctionManager.createAuction({cachedAdUnits, cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, useYmpbCache, skipRendering});
+
+      const cachAuction = auctionManager.createAuction({cachedAdUnits, cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId, useYmpbCache});
       cachedAdUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, cachAuction.getAuctionId()));
       cachAuction.callCaches(bidCaches);
+
       adUnitCodes = adUnitCodes.filter(_code => cachedAdUnitCodes.indexOf(_code) < 0);
       adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
     }
@@ -497,10 +499,6 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
   // return auction;
 
   if (adUnitCodes.length) {
-    var auctionOpts = {adUnits, adUnitCodes, cbTimeout, labels, useYmpbCache, skipRendering};
-    if (!skipRendering) {
-      auctionOpts.callback = bidsBackHandler;
-    }
     const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId});
     let adUnitsLen = adUnits.length;
     if (adUnitsLen > 15) {

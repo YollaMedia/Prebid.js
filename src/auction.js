@@ -89,7 +89,7 @@ const queuedCalls = [];
   *
   * @returns {Auction} auction instance
   */
-export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, auctionId, useYmpbCache, skipRendering}) { // YMPB
+export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, auctionId, useYmpbCache}) { // YMPB
   let _adUnits = adUnits;
   let _labels = labels;
   let _adUnitCodes = adUnitCodes;
@@ -105,7 +105,6 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
   let _timeout = cbTimeout;
   let _winningBids = [];
   let _useYmpbCache = useYmpbCache;
-  let _skipRendering = skipRendering;
   let _timelyBidders = new Set();
 
   function addBidRequests(bidderRequests) { _bidderRequests = _bidderRequests.concat(bidderRequests) };
@@ -135,8 +134,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       bidsReceived: _bidsReceived,
       winningBids: _winningBids,
       timeout: _timeout,
-      useYmpbCache: _useYmpbCache,
-      skipRendering: _skipRendering
+      useYmpbCache: _useYmpbCache
     };
   }
 
@@ -158,24 +156,6 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
     }
 
     if (_callback != null) {
-      /**
-       * YMPB CACHE INJECTION
-       * This process need to be skipped, if the requestion is not for Ad rendering
-       */
-      // if (_callback.cacheInjection) {
-      //   try {
-      //     var higestCpmBids = YMPB.getHighestCpmBidsFromCache(_adUnitCodes);
-      //     higestCpmBids.forEach(function (bid) {
-      //       if (bid.auctionId !== _auctionId || (bid.__bidFrom && bid.__bidFrom !== bid.adUnitCode)) {
-      //         removeBidReceived(bid);
-      //         bid.auctionId = _auctionId;
-      //         addBidReceived(bid);
-      //       }
-      //     });
-      //   } catch (error) {
-      //     utils.logError(error);
-      //   }
-      // }
       let timedOutBidders = [];
       if (timedOut) {
         utils.logMessage(`Auction ${_auctionId} timedOut`);
@@ -222,6 +202,10 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
   }
 
   // YMPB
+  /**
+   * YMPB CACHE INJECTION
+   * This process need to be skipped, if the requestion is not for Ad rendering
+   */
   function callCaches(bids) {
     _auctionStatus = AUCTION_STARTED;
     console.log(_auctionId);
@@ -232,7 +216,24 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       bid.auctionId = _auctionId;
       addBidReceived(bid);
     });
-    auctionDone();
+    // auctionDone();
+    _auctionStatus = AUCTION_COMPLETED;
+    executeCacheCallback(bids);
+  }
+
+  // YMPB
+  function executeCacheCallback(_bidsReceived) {
+    clearTimeout(_timer);
+
+    if (_callback != null) {
+      const adUnitCodes = _adUnitCodes;
+      const bids = _bidsReceived
+        .filter(utils.bind.call(adUnitsFilter, this, adUnitCodes))
+        .reduce(groupByPlacement, {});
+      _callback.apply($$PREBID_GLOBAL$$, [bids, false]);
+
+      _callback = null;
+    }
   }
 
   function onTimelyResponse(bidderCode) {
