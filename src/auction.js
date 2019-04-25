@@ -208,9 +208,6 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
    */
   function callCaches(bids) {
     _auctionStatus = AUCTION_STARTED;
-    console.log(_auctionId);
-    console.log(_adUnits);
-    console.log(_adUnitCodes);
     bids.forEach(bid => {
       removeBidReceived(bid);
       bid.auctionId = _auctionId;

@@ -489,9 +489,6 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
     }
   }
 
-  console.log('adUnitCodes => ', adUnitCodes);
-  console.log('adUnits => ', adUnits);
-
   // const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId});
 
   // adUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, auction.getAuctionId()));
