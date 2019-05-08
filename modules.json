@@ -11,6 +11,7 @@
     "ixBidAdapter",
     "openxBidAdapter",
     "pulsepointBidAdapter",
+    "rhythmoneBidAdapter",
     "rubiconBidAdapter",
     "sovrnBidAdapter",
     "tripleliftBidAdapter"
