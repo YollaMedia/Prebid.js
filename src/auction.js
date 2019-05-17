@@ -175,7 +175,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
         const bids = _bidsReceived
           .filter(utils.bind.call(adUnitsFilter, this, adUnitCodes))
           .reduce(groupByPlacement, {});
-        _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut]);
+        _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut, false, adUnitCodes]); // YMPB adding false, adUnitCodes
       } catch (e) {
         utils.logError('Error executing bidsBackHandler', null, e);
       } finally {
@@ -227,7 +227,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       const bids = _bidsReceived
         .filter(utils.bind.call(adUnitsFilter, this, adUnitCodes))
         .reduce(groupByPlacement, {});
-      _callback.apply($$PREBID_GLOBAL$$, [bids, false]);
+      _callback.apply($$PREBID_GLOBAL$$, [bids, false, true, adUnitCodes]);
 
       _callback = null;
     }
