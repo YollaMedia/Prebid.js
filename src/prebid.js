@@ -482,7 +482,7 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
       var cachedAdUnitCodes = bidCaches.map(bid => bid.adUnitCode);
       var cachedAdUnits = adUnits.filter(unit => includes(cachedAdUnitCodes, unit.code));
 
-      const cachAuction = auctionManager.createAuction({cachedAdUnits, cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId, useYmpbCache});
+      const cachAuction = auctionManager.createAuction({adUnits: cachedAdUnits, adUnitCodes: cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId, useYmpbCache});
       cachedAdUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, cachAuction.getAuctionId()));
       cachAuction.callCaches(bidCaches);
 
