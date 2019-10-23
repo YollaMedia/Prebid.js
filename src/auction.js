@@ -134,7 +134,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       bidsReceived: _bidsReceived,
       winningBids: _winningBids,
       timeout: _timeout,
-      useYmpbCache: _useYmpbCache
+      useYmpbCache: _useYmpbCache,
     };
   }
 
@@ -208,7 +208,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
    * YMPB CACHE INJECTION
    * This process need to be skipped, if the requestion is not for Ad rendering
    */
-  function callCaches(bids) {
+  function callCaches(bids, useCachePostAuction) {
     _auctionStatus = AUCTION_STARTED;
     bids.forEach(bid => {
       removeBidReceived(bid);
@@ -216,8 +216,10 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       addBidReceived(bid);
     });
     // auctionDone();
-    _auctionStatus = AUCTION_COMPLETED;
-    executeCacheCallback(bids);
+    if (!useCachePostAuction) {
+      _auctionStatus = AUCTION_COMPLETED;
+      executeCacheCallback(bids);
+    }
   }
 
   // YMPB

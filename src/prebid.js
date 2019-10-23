@@ -416,7 +416,7 @@ $$PREBID_GLOBAL$$.removeAdUnit = function (adUnitCode) {
  * @alias module:pbjs.requestBids
  */
 // YMPB: adding useYmpbCache
-$$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, auctionId, useYmpbCache } = {}) {
+$$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeout, adUnits, adUnitCodes, labels, auctionId, useYmpbCache, useCachePostAuction } = {}) {
   events.emit(REQUEST_BIDS);
   const cbTimeout = timeout || config.getConfig('bidderTimeout');
   adUnits = adUnits || $$PREBID_GLOBAL$$.adUnits;
@@ -485,19 +485,24 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
     return;
   }
 
+  var cachedAdUnitCodes = [];
+  var cachedAdUnits = [];
+
   // YMPB
   if (useYmpbCache) {
     var bidCaches = YMPB.getBidsFromCache(adUnits);
     if (bidCaches.length) {
-      var cachedAdUnitCodes = bidCaches.map(bid => bid.adUnitCode);
-      var cachedAdUnits = adUnits.filter(unit => includes(cachedAdUnitCodes, unit.code));
+      cachedAdUnitCodes = bidCaches.map(bid => bid.adUnitCode);
+      cachedAdUnits = adUnits.filter(unit => includes(cachedAdUnitCodes, unit.code));
 
-      const cachAuction = auctionManager.createAuction({adUnits: cachedAdUnits, adUnitCodes: cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId, useYmpbCache});
-      cachedAdUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, cachAuction.getAuctionId()));
-      cachAuction.callCaches(bidCaches);
+      if (!useCachePostAuction) {
+        const cachAuction = auctionManager.createAuction({adUnits: cachedAdUnits, adUnitCodes: cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId, useYmpbCache});
+        cachedAdUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, cachAuction.getAuctionId()));
+        cachAuction.callCaches(bidCaches, false);
 
-      adUnitCodes = adUnitCodes.filter(_code => cachedAdUnitCodes.indexOf(_code) < 0);
-      adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
+        adUnitCodes = adUnitCodes.filter(_code => cachedAdUnitCodes.indexOf(_code) < 0);
+        adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
+      }
     }
   }
 
@@ -515,6 +520,9 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
     }
     adUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, auction.getAuctionId()));
     auction.callBids();
+    if (useYmpbCache && useCachePostAuction) {
+      auction.callCaches(bidCaches, true);
+    }
     return auction;
   }
 });
