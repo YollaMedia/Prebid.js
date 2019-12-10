@@ -169,30 +169,32 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       _auctionEnd = Date.now();
 
       events.emit(CONSTANTS.EVENTS.AUCTION_END, getProperties());
-      try {
-        if (_callback != null) {
-          const adUnitCodes = _adUnitCodes;
-          const bids = _bidsReceived
-            .filter(utils.bind.call(adUnitsFilter, this, adUnitCodes))
-            .reduce(groupByPlacement, {});
-          // _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut]);
-          _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut, false, adUnitCodes]); // YMPB adding false, adUnitCodes
-          _callback = null;
+      bidsBackCallback(_adUnitCodes, function () {
+        try {
+          if (_callback != null) {
+            const adUnitCodes = _adUnitCodes;
+            const bids = _bidsReceived
+              .filter(utils.bind.call(adUnitsFilter, this, adUnitCodes))
+              .reduce(groupByPlacement, {});
+            // _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut]);
+            _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut, false, adUnitCodes]); // YMPB adding false, adUnitCodes
+            _callback = null;
+          }
+        } catch (e) {
+          utils.logError('Error executing bidsBackHandler', null, e);
+        } finally {
+          // Calling timed out bidders
+          if (timedOutBidders.length) {
+            adapterManager.callTimedOutBidders(adUnits, timedOutBidders, _timeout);
+          }
+          // Only automatically sync if the publisher has not chosen to "enableOverride"
+          let userSyncConfig = config.getConfig('userSync') || {};
+          if (!userSyncConfig.enableOverride) {
+            // Delay the auto sync by the config delay
+            syncUsers(userSyncConfig.syncDelay);
+          }
         }
-      } catch (e) {
-        utils.logError('Error executing bidsBackHandler', null, e);
-      } finally {
-        // Calling timed out bidders
-        if (timedOutBidders.length) {
-          adapterManager.callTimedOutBidders(adUnits, timedOutBidders, _timeout);
-        }
-        // Only automatically sync if the publisher has not chosen to "enableOverride"
-        let userSyncConfig = config.getConfig('userSync') || {};
-        if (!userSyncConfig.enableOverride) {
-          // Delay the auto sync by the config delay
-          syncUsers(userSyncConfig.syncDelay);
-        }
-      }
+      })
     }
   }
 
@@ -379,6 +381,12 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
 export const addBidResponse = hook('async', function(adUnitCode, bid) {
   this.dispatch.call(this.bidderRequest, adUnitCode, bid);
 }, 'addBidResponse');
+
+export const bidsBackCallback = hook('async', function (adUnits, callback) {
+  if (callback) {
+    callback();
+  }
+}, 'bidsBackCallback');
 
 export function auctionCallbacks(auctionDone, auctionInstance) {
   let outstandingBidsAdded = 0;
