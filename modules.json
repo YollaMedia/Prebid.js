@@ -4,6 +4,7 @@
     "appnexusBidAdapter",
     "beachfrontBidAdapter",
     "consentManagement",
+    "consentManagementUsp",
     "conversantBidAdapter",
     "dfpAdServerVideo",
     "districtmDMXBidAdapter",
