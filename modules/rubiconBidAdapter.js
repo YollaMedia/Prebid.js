@@ -575,7 +575,7 @@ export const spec = {
             currency: responseObj.cur || 'USD',
             creativeId: bid.crid,
             cpm: bid.price || 0,
-            bidderCode: seatbid.seat,
+            bidderCode: bidRequest.bidder, // YMPB seatbid.seat | bidRequest.bidder, TODO: double verify
             ttl: 300,
             netRevenue: config.getConfig('rubicon.netRevenue') !== false, // If anything other than false, netRev is true
             width: bid.w || utils.deepAccess(bidRequest, 'mediaTypes.video.w') || utils.deepAccess(bidRequest, 'params.video.playerWidth'),
