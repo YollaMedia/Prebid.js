@@ -524,7 +524,7 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
 
   // YMPB
   if (useYmpbCache) {
-    var bidCaches = YMPB.getBidsFromCache(adUnits);
+    var bidCaches = $$PREBID_GLOBAL$$.getBidsFromCache(adUnits);
     if (bidCaches.length) {
       cachedAdUnitCodes = bidCaches.map(bid => bid.adUnitCode);
       cachedAdUnits = adUnits.filter(unit => includes(cachedAdUnitCodes, unit.code));
@@ -921,12 +921,6 @@ $$PREBID_GLOBAL$$.processQueue = function() {
   processQueue($$PREBID_GLOBAL$$.cmd);
 };
 
-$$PREBID_GLOBAL$$.getHighestCpmBidsFromBidPool = function (bids, adUnitCode) {
-  let bidsReceived = getHighestCpmBidsFromBidPool(bids, getLatestHighestCpmBid);
-  return adUnitCode ? targeting.getWinningBids(adUnitCode, bidsReceived)
-    .map(removeRequestId) : bidsReceived;
-};
-
 // YMPB
 $$PREBID_GLOBAL$$.addBid = function(bid) {
   auctionManager.addBidReceived(bid);
@@ -1014,8 +1008,5 @@ $$PREBID_GLOBAL$$.setTargetingForGPT = function(targetingSet, customSlotMatching
 //   }
 //   return auction;
 // });
-
-// YMPB
-$$PREBID_GLOBAL$$.getPriceBucketString = getPriceBucketString;
 
 export default $$PREBID_GLOBAL$$;
