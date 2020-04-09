@@ -190,12 +190,9 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
             const bids = _bidsReceived
               .filter(utils.bind.call(adUnitsFilter, this, adUnitCodes))
               .reduce(groupByPlacement, {});
-<<<<<<< HEAD
             // _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut]);
-            _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut, false, adUnitCodes]); // YMPB adding false, adUnitCodes
-=======
-            _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut, _auctionId]);
->>>>>>> 3.15.0
+            _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut, false, adUnitCodes, _auctionId]); // YMPB adding false, adUnitCodes
+            // _callback.apply($$PREBID_GLOBAL$$, [bids, timedOut, _auctionId]);
             _callback = null;
           }
         } catch (e) {

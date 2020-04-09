@@ -177,11 +177,7 @@ export let uspDataHandler = {
   }
 };
 
-<<<<<<< HEAD
-adapterManager.makeBidRequests = function(adUnits, auctionStart, auctionId, cbTimeout, labels) {
-=======
 adapterManager.makeBidRequests = hook('sync', function (adUnits, auctionStart, auctionId, cbTimeout, labels) {
->>>>>>> 3.15.0
   /**
    * emit and pass adunits for external modification
    * @see {@link https://github.com/prebid/Prebid.js/issues/4149|Issue}

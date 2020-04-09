@@ -1,18 +1,9 @@
-<<<<<<< HEAD
-import * as utils from '../src/utils';
-import { BANNER, VIDEO } from '../src/mediaTypes';
-import { config } from '../src/config';
-import find from 'core-js/library/fn/array/find';
-import isInteger from 'core-js/library/fn/number/is-integer';
-import { registerBidder } from '../src/adapters/bidderFactory';
-=======
 import * as utils from '../src/utils.js';
 import { BANNER, VIDEO } from '../src/mediaTypes.js';
 import { config } from '../src/config.js';
 import find from 'core-js/library/fn/array/find.js';
 import isInteger from 'core-js/library/fn/number/is-integer.js';
 import { registerBidder } from '../src/adapters/bidderFactory.js';
->>>>>>> 3.15.0
 
 const BIDDER_CODE = 'ix';
 const SECURE_BID_URL = 'https://as-sec.casalemedia.com/cygnus';
