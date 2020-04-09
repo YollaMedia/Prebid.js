@@ -12,6 +12,7 @@
     "ixBidAdapter",
     "openxBidAdapter",
     "prebidServerBidAdapter",
+    "pubCommonIdSystem",
     "pulsepointBidAdapter",
     "rhythmoneBidAdapter",
     "rubiconBidAdapter",
