@@ -217,7 +217,27 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
     // when all bidders have called done callback atleast once it means auction is complete
     utils.logInfo(`Bids Received for Auction with id: ${_auctionId}`, _bidsReceived);
     _auctionStatus = AUCTION_COMPLETED;
+    if (_useYmpbCache) {
+      auctionCache();
+    }
     executeCallback(false, true);
+  }
+
+  // YMPB
+  function auctionCache() {
+    var bidCaches = $$PREBID_GLOBAL$$.getBidsFromCache(_adUnits, _bidsReceived, _labels);
+    bidCaches.map(bid => {
+      // try to remove duplicated bidder code from bidResponse
+      let _bid = find(_bidsReceived, _bidReceived => _bidReceived.adUnitCode === bid.adUnitCode && _bidReceived.bidderCode === bid.bidderCode);
+
+      if (_bid) {
+        removeBidReceived(_bid);
+      }
+
+      removeBidReceived(bid);
+      bid.auctionId = _auctionId;
+      addBidReceived(bid);
+    });
   }
 
   // YMPB
@@ -225,7 +245,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
    * YMPB CACHE INJECTION
    * This process need to be skipped, if the requestion is not for Ad rendering
    */
-  function callCaches(bids, useCachePostAuction) {
+  function callCaches(bids) {
     _auctionStatus = AUCTION_STARTED;
     bids.forEach(bid => {
       removeBidReceived(bid);
@@ -233,10 +253,8 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       addBidReceived(bid);
     });
     // auctionDone();
-    if (!useCachePostAuction) {
-      _auctionStatus = AUCTION_COMPLETED;
-      executeCacheCallback(bids);
-    }
+    _auctionStatus = AUCTION_COMPLETED;
+    executeCacheCallback(bids);
   }
 
   // YMPB
