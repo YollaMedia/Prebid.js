@@ -523,20 +523,18 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
   var cachedAdUnits = [];
 
   // YMPB
-  if (useYmpbCache) {
-    var bidCaches = $$PREBID_GLOBAL$$.getBidsFromCache(adUnits);
+  if (useYmpbCache && !useCachePostAuction) {
+    var bidCaches = $$PREBID_GLOBAL$$.getBidsFromCache(adUnits, [], labels);
     if (bidCaches.length) {
       cachedAdUnitCodes = bidCaches.map(bid => bid.adUnitCode);
       cachedAdUnits = adUnits.filter(unit => includes(cachedAdUnitCodes, unit.code));
 
-      if (!useCachePostAuction) {
-        const cachAuction = auctionManager.createAuction({adUnits: cachedAdUnits, adUnitCodes: cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId, useYmpbCache});
-        cachedAdUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, cachAuction.getAuctionId()));
-        cachAuction.callCaches(bidCaches, false);
+      const cachAuction = auctionManager.createAuction({adUnits: cachedAdUnits, adUnitCodes: cachedAdUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId, useYmpbCache});
+      cachedAdUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, cachAuction.getAuctionId()));
+      cachAuction.callCaches(bidCaches, false);
 
-        adUnitCodes = adUnitCodes.filter(_code => cachedAdUnitCodes.indexOf(_code) < 0);
-        adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
-      }
+      adUnitCodes = adUnitCodes.filter(_code => cachedAdUnitCodes.indexOf(_code) < 0);
+      adUnits = adUnits.filter(unit => includes(adUnitCodes, unit.code));
     }
   }
 
@@ -547,16 +545,13 @@ $$PREBID_GLOBAL$$.requestBids = hook('async', function ({ bidsBackHandler, timeo
   // return auction;
 
   if (adUnitCodes.length) {
-    const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId});
+    const auction = auctionManager.createAuction({adUnits, adUnitCodes, callback: bidsBackHandler, cbTimeout, labels, auctionId, useYmpbCache: useCachePostAuction}); // YMPB
     let adUnitsLen = adUnits.length;
     if (adUnitsLen > 15) {
       utils.logInfo(`Current auction ${auction.getAuctionId()} contains ${adUnitsLen} adUnits.`, adUnits);
     }
     adUnitCodes.forEach(code => targeting.setLatestAuctionForAdUnit(code, auction.getAuctionId()));
     auction.callBids();
-    if (useYmpbCache && useCachePostAuction) {
-      auction.callCaches(bidCaches, true);
-    }
     return auction;
   }
 });
