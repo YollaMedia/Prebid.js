@@ -66,7 +66,7 @@ export const spec = {
       let context = utils.deepAccess(bidRequest, 'mediaTypes.video.context');
       return {
         requestId: bidRequest.bidId,
-        bidderCode: spec.code,
+        bidderCode: bidRequest.bidder, // YMPB bidderCode: spec.code,
         vastUrl: response.url,
         vastXml: response.vast,
         cpm: response.bidPrice,
@@ -90,7 +90,7 @@ export const spec = {
           let request = find(bidRequest, req => req.adUnitCode === bid.slot);
           return {
             requestId: request.bidId,
-            bidderCode: spec.code,
+            bidderCode: bidRequest.bidder, // YMPB bidderCode: spec.code,
             ad: bid.adm,
             creativeId: bid.crid,
             cpm: bid.price,
