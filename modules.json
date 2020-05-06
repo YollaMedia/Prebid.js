@@ -16,6 +16,7 @@
     "pulsepointBidAdapter",
     "rhythmoneBidAdapter",
     "rubiconBidAdapter",
+    "schain",
     "s2sTesting",
     "sovrnBidAdapter",
     "tripleliftBidAdapter"

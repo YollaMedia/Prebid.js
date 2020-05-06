@@ -69,6 +69,7 @@ import { hook } from './hook.js';
 import find from 'core-js/library/fn/array/find.js';
 import { OUTSTREAM } from './video.js';
 import { VIDEO } from './mediaTypes.js';
+import { auctionManager } from './auctionManager.js'; // YMPB
 
 const { syncUsers } = userSync;
 const utils = require('./utils.js');
@@ -128,7 +129,6 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       const _bid = _bidsReceived[index];
       if (bid.adId === _bid.adId) {
         _bidsReceived.splice(index, 1);
-        break;
       }
     }
   }
@@ -223,7 +223,9 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
     executeCallback(false, true);
   }
 
-  // YMPB
+  /**
+   * YMPB AUCTION WITH CACHE
+   */
   function auctionCache() {
     var bidCaches = $$PREBID_GLOBAL$$.getBidsFromCache(_adUnits, _bidsReceived, _labels);
     bidCaches.map(bid => {
@@ -231,16 +233,17 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
       let _bid = find(_bidsReceived, _bidReceived => _bidReceived.adUnitCode === bid.adUnitCode && _bidReceived.bidderCode === bid.bidderCode);
 
       if (_bid) {
+        // remove new bid from current auction
         removeBidReceived(_bid);
       }
 
-      removeBidReceived(bid);
+      // remove bid from all existed auctions
+      auctionManager.removeBidReceived(bid);
       bid.auctionId = _auctionId;
       addBidReceived(bid);
     });
   }
 
-  // YMPB
   /**
    * YMPB CACHE INJECTION
    * This process need to be skipped, if the requestion is not for Ad rendering
@@ -248,7 +251,7 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
   function callCaches(bids) {
     _auctionStatus = AUCTION_STARTED;
     bids.forEach(bid => {
-      removeBidReceived(bid);
+      auctionManager.removeBidReceived(bid);
       bid.auctionId = _auctionId;
       addBidReceived(bid);
     });
