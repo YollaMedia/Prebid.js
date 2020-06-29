@@ -19,5 +19,6 @@
     "schain",
     "s2sTesting",
     "sovrnBidAdapter",
+    "synacormediaBidAdapter",
     "tripleliftBidAdapter"
 ]
