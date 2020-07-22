@@ -9,7 +9,7 @@ import { auctionManager } from './auctionManager.js';
 import { targeting } from './targeting.js';
 import { hook } from './hook.js';
 import { sessionLoader } from './debugging.js';
-import includes from 'core-js/library/fn/array/includes.js';
+import includes from 'core-js-pure/features/array/includes.js';
 import { adunitCounter } from './adUnits.js';
 import { isRendererRequired, executeRenderer } from './Renderer.js';
 import { createBid } from './bidfactory.js';
@@ -278,7 +278,7 @@ $$PREBID_GLOBAL$$.setTargetingForGPTAsync = function (adUnit, customSlotMatching
   let targetingSet = targeting.getAllTargeting(adUnit);
 
   // first reset any old targeting
-  targeting.resetPresetTargeting(adUnit);
+  targeting.resetPresetTargeting(adUnit, customSlotMatching);
 
   if ($$PREBID_GLOBAL$$.resetTargetKey) {
     targetingSet = $$PREBID_GLOBAL$$.resetTargetKey(targetingSet);
