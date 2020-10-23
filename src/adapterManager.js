@@ -94,6 +94,26 @@ function getBids({bidderCode, auctionId, bidderRequestId, adUnits, labels, src})
             );
           }
 
+          if (active && bid.labelAny && bid.labelAny.length) {
+            labels.forEach(function(_label) {
+              if (bid.labelAny.indexOf(_label) < 0) {
+                active = false;
+              }
+            });
+          }
+
+          // if (active && labels.length) {
+          //   if (bid.labelAny && bid.labelAny.length) {
+          //     labels.forEach(function(_label) {
+          //       if (bid.labelAny.indexOf(_label) < 0) {
+          //         active = false;
+          //       }
+          //     });
+          //   } else {
+          //     active = false;
+          //   }
+          // }
+
           if (active) {
             bids.push(Object.assign({}, bid, {
               adUnitCode: adUnit.code,

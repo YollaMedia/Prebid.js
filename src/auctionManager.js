@@ -111,12 +111,16 @@ export function newAuctionManager() {
   }
 
   auctionManager.removeBidReceived = function(bid) {
-    const auction = find(_auctions, auction => auction.getAuctionId() === bid.auctionId);
-    if (auction) {
+    for (let index = 0; index < _auctions.length; index++) {
+      let auction = _auctions[index];
       auction.removeBidReceived(bid);
-    } else {
-      logWarn(`Auction not found when removing bid`);
     }
+    // const auction = find(_auctions, auction => auction.getAuctionId() === bid.auctionId);
+    // if (auction) {
+    //   auction.removeBidReceived(bid);
+    // } else {
+    //   logWarn(`Auction not found when removing bid`);
+    // }
   }
 
   auctionManager.getAuction = function(auctionId) {
