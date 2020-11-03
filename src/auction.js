@@ -57,7 +57,7 @@
  * @property {function(): void} callBids - sends requests to all adapters for bids
  */
 
-import {flatten, timestamp, adUnitsFilter, deepAccess, getBidRequest, getValue, parseUrl} from './utils.js';
+import {flatten, timestamp, adUnitsFilter, deepAccess, getBidRequest, getValue, parseUrl, isBoolean} from './utils.js';
 import { getPriceBucketString } from './cpmBucketManager.js';
 import { getNativeTargeting } from './native.js';
 import { getCacheUrl, store } from './videoCache.js';
@@ -230,9 +230,9 @@ export function newAuction({adUnits, adUnitCodes, callback, cbTimeout, labels, a
    * YMPB AUCTION WITH BID FROM CACHE
    */
   function auctionCache() {
-    var bidCaches = [];
     // if (typeof ympbCache === 'object' && ympbCache.length > 0) {}
-    $$PREBID_GLOBAL$$.getBidsFromCache(_adUnits, _bidsReceived, _labels);
+    var bidCaches = $$PREBID_GLOBAL$$.getBidsFromCache(_adUnits, _bidsReceived, _labels);
+    
     bidCaches.map(bid => {
       // try to remove duplicated bidder code from bidResponse
       let _bid = find(_bidsReceived, _bidReceived => _bidReceived.adUnitCode === bid.adUnitCode && _bidReceived.bidderCode === bid.bidderCode);
@@ -592,7 +592,7 @@ function getPreparedBidForAuction({adUnitCode, bid, bidderRequest, auctionId}) {
   const bidReq = bidderRequest.bids && find(bidderRequest.bids, bid => bid.adUnitCode == adUnitCode);
   const adUnitRenderer = bidReq && bidReq.renderer;
 
-  if (adUnitRenderer && adUnitRenderer.url) {
+  if (adUnitRenderer && adUnitRenderer.url && !(adUnitRenderer.backupOnly && isBoolean(adUnitRenderer.backupOnly) && bid.renderer)) {
     bidObject.renderer = Renderer.install({ url: adUnitRenderer.url });
     bidObject.renderer.setRender(adUnitRenderer.render);
   }

@@ -446,14 +446,14 @@ adapterManager.registerBidAdapter = function (bidAdaptor, bidderCode, {supported
   }
 };
 
-// YMPB
+// YMPB checkBidAdapter
 adapterManager.checkBidAdapter = function(bidderCode) {
   let s2sConfig = config.getConfig('s2sConfig');
   let s2sBidders = s2sConfig && s2sConfig.bidders;
   return typeof _bidderRegistry[bidderCode] !== 'undefined' || (s2sBidders && includes(s2sBidders, alias));
 }
 
-adapterManager.aliasBidAdapter = function (bidderCode, alias) {
+adapterManager.aliasBidAdapter = function (bidderCode, alias, options) {
   let existingAlias = _bidderRegistry[alias];
 
   if (typeof existingAlias === 'undefined') {
@@ -479,7 +479,8 @@ adapterManager.aliasBidAdapter = function (bidderCode, alias) {
           newAdapter.setBidderCode(alias);
         } else {
           let spec = bidAdaptor.getSpec();
-          newAdapter = newBidder(Object.assign({}, spec, { code: alias }));
+          let gvlid = options && options.gvlid;
+          newAdapter = newBidder(Object.assign({}, spec, { code: alias, gvlid }));
           _aliasRegistry[alias] = bidderCode;
         }
         adapterManager.registerBidAdapter(newAdapter, alias, {
@@ -494,11 +495,11 @@ adapterManager.aliasBidAdapter = function (bidderCode, alias) {
   }
 };
 
-adapterManager.registerAnalyticsAdapter = function ({adapter, code}) {
+adapterManager.registerAnalyticsAdapter = function ({adapter, code, gvlid}) {
   if (adapter && code) {
     if (typeof adapter.enableAnalytics === 'function') {
       adapter.code = code;
-      _analyticsRegistry[code] = adapter;
+      _analyticsRegistry[code] = { adapter, gvlid };
     } else {
       utils.logError(`Prebid Error: Analytics adaptor error for analytics "${code}"
         analytics adapter must implement an enableAnalytics() function`);
@@ -514,7 +515,7 @@ adapterManager.enableAnalytics = function (config) {
   }
 
   utils._each(config, adapterConfig => {
-    var adapter = _analyticsRegistry[adapterConfig.provider];
+    var adapter = _analyticsRegistry[adapterConfig.provider].adapter;
     if (adapter) {
       adapter.enableAnalytics(adapterConfig);
     } else {
@@ -522,11 +523,15 @@ adapterManager.enableAnalytics = function (config) {
         ${adapterConfig.provider}.`);
     }
   });
-};
+}
 
 adapterManager.getBidAdapter = function(bidder) {
   return _bidderRegistry[bidder];
 };
+
+adapterManager.getAnalyticsAdapter = function(code) {
+  return _analyticsRegistry[code];
+}
 
 // the s2sTesting module is injected when it's loaded rather than being imported
 // importing it causes the packager to include it even when it's not explicitly included in the build
