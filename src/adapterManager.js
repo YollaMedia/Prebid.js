@@ -94,6 +94,7 @@ function getBids({bidderCode, auctionId, bidderRequestId, adUnits, labels, src})
             );
           }
 
+          // Logic for YMPB
           if (active && bid.labelAny && bid.labelAny.length) {
             labels.forEach(function(_label) {
               if (bid.labelAny.indexOf(_label) < 0) {
